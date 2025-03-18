@@ -18,6 +18,11 @@ TELETABOT is an advanced tool designed to monitor, intercept, and analyze Telegr
 
 Built for security researchers, penetration testers, and digital forensics experts, TELETABOT provides a powerful and efficient way to track bot communications while maintaining full control over the data flow.
 
+### How to get Your telegram API
+  * Visit [telegram](my.telegram.org/apps) and log in with your phone number.
+  * Create a new application and get [APP api_id], [App api_hash] value
+
+
 ### INSTALLATION
     git clone https://github.com/0xbitx/DEDSEC_TELETABOT.git
     cd DEDSEC_TELETABOT
