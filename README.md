@@ -35,6 +35,7 @@ Built for security researchers, penetration testers, and digital forensics exper
 * Kali Linux 
 * Parrot OS 
 * Ubuntu
+* Termux
   
 ## Legal Disclaimer
 
