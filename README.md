@@ -7,14 +7,30 @@
 
 ### DESCRIPTION
 
-TELETABOT is an advanced tool designed to monitor, intercept, and analyze Telegram bot activity using the Telegram Bot API and Telethon. It automates the process of capturing messages from target bots—whether for security research, penetration testing, or intelligence gathering—and forwards them to your designated account in real-time.
+TELETABOT is an advanced intelligence-gathering tool designed to extract information from Telegram bots using the Telegram Bot API. It enables security researchers and investigators to monitor and analyze bot activities for threat intelligence and cybersecurity purposes.
+With TELETABOT, you can:
 
-### With TELETABOT, you can:
+   * Extract Bot Information: Retrieve comprehensive details about target bots including usernames and metadata
+   * Monitor Message Traffic: Capture and forward bot messages to your own chat for analysis
+   * Download Owner Profile Pictures: Extract and save profile images of bot operators for identification
+   * Intercept Bot Communications: Automatically forward all messages from target bots to your controlled environment
+   * Gather Threat Intelligence: Collect valuable data for security research and incident response
 
-  * Extract and log conversations from Telegram bots effortlessly.
-  * Monitor malicious bots to detect suspicious activities.
-  * Automate data collection for cybersecurity investigations.
-  * Securely forward intercepted messages to your own chat for further analysis.
+### Key Features:
+
+   * Bot Information Extraction: Uses getMe API to retrieve bot details
+   * Message Interception: Forwards messages from target bots to your account
+   * Profile Picture Dumping: Downloads all profile photos of bot owners/operators
+   * Real-time Monitoring: Captures and displays message content in formatted tables
+   * Session Management: Stores Telegram credentials for persistent operations
+
+### Technical Capabilities:
+
+   * Supports multiple content types (text, images, documents, videos)
+   * Handles bulk message forwarding through update tracking
+   * Organizes extracted profile pictures in dedicated directories
+   * Provides structured output with message IDs, types, and content
+   * Maintains session persistence for repeated operations
 
 Built for security researchers, penetration testers, and digital forensics experts, TELETABOT provides a powerful and efficient way to track bot communications while maintaining full control over the data flow.
 
@@ -35,7 +51,6 @@ Built for security researchers, penetration testers, and digital forensics exper
 * Kali Linux 
 * Parrot OS 
 * Ubuntu
-* Termux
   
 ## Legal Disclaimer
 
